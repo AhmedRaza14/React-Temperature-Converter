@@ -2,20 +2,59 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
+
   const [converter, setConverter] = useState("celsius");
+  const [history, setHistory] = useState([])
   const [temperature, setTemperature] = useState("");
   const [result, setResult] = useState(null);
   const [icon, setIcon] = useState("°C");
+  const [showHistory, setShowHistory] = useState(false)
+  
+  
   const convertTemperature = (value) => {
-    if (converter === "celsius") {
-      setResult((value - 32) * 5 / 9);
-      setIcon("°F");
-    } 
-    else {
-      setResult((value * 9 / 5) + 32);
-      setIcon("°C");
+    
+    let calculatedResult;
+    let resultIcon;
+    if (value === "") {
+      alert('there is no input')
     }
+    else{
+  const num = Number(value);
+
+  if (converter === "celsius") {
+    calculatedResult = (num * 9 / 5) + 32;
+    resultIcon = "°F";
+  } else {
+    calculatedResult = (num - 32) * 5 / 9;
+    resultIcon = "°C";
   }
+  
+  setResult(calculatedResult);
+  setIcon(resultIcon);
+  
+  const newRead = {
+    temperature: num,
+    inputicon : (converter === "celsius") ? "°C" : "°F",
+    result: calculatedResult,
+    icon: resultIcon,
+  };
+  
+  setHistory([...history, newRead]);
+  setTemperature("");
+};
+}
+
+  const viewHistory = () => {
+    if(!showHistory)
+    {
+      setShowHistory(true)
+    }
+      else{
+        setShowHistory(false)
+      }
+  }
+
+
   return (
       <div>
 <div>
@@ -30,7 +69,8 @@ function App() {
     
     <div style={{
       width: '400px',
-      height: '200px',
+      minHeight: '300px',
+      maxHeight: '600px',
       margin: '30px',
       backgroundColor: 'white',
       display: 'flex',
@@ -62,7 +102,7 @@ function App() {
        
       }}
       value={temperature}
-      onChange={(e) => setTemperature(Number(e.target.value))}
+      onChange={(e) => setTemperature(e.target.value)}
       /> 
      <select name="converter" id="converter"
      style={{
@@ -85,25 +125,94 @@ function App() {
     <div>
       <button
       style={{
-        backgroundColor: '#dddddd',
-        border: '1px solid black',
+        backgroundColor: 'rgb(19, 67, 223)',
+        border: '1px solid rgb(20, 64, 208)',
+        marginTop: '15px',
+        color: 'white',
+        fontSize: '16px',
         borderRadius: '7px',
         
       }}
-      onMouseEnter={(e) => e.target.style.backgroundColor = "#108832"}
-      onMouseLeave={(e) => e.target.style.backgroundColor = "#dddddd"}
+      onMouseEnter={(e) => {
+        e.target.style.opacity = "0.7";
+        e.target.style.border = "1px solid rgb(20, 64, 208)";
+        }}
+      onMouseLeave={(e) => {
+        e.target.style.opacity = "1";
+        e.target.style.border = "none";
+        }}
       onClick={() => convertTemperature(temperature)}
       >Convert</button>
+
+              <div>
+                <h2 style={{
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  margin: '10px 0',
+                }}>
+                  {result !== null && `${result.toFixed(2)} ${icon}`}
+                </h2>
+              </div>
+      <button
+            style={{
+        backgroundColor: 'rgb(11, 128, 13)',
+        border: '1px solid rgb(11, 128, 13)',
+        marginTop: '15px',
+        color: 'white',
+        fontSize: '16px',
+        borderRadius: '7px',
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.opacity = "0.7";
+        e.target.style.border = "1px solid rgb(11, 128, 13)";
+        }}
+      onMouseLeave={(e) => {
+        e.target.style.opacity = "1";
+        e.target.style.border = "none";
+        }}
+            onClick={viewHistory}
+          >
+            View History
+          </button>
+
     </div>
-    <div>
-      <h2 style={{
-        fontSize: '24px',
-        fontWeight: 'bold',
-        margin: '10px 0',
-      }}>
-        {result !== null && `${result.toFixed(2)} ${icon}`}
-      </h2>
-    </div>
+
+      <div
+          style={{
+            marginTop: '20px',
+            marginBottom: '20px',
+            width: '80%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'start',
+            padding: '20px',
+            // backgroundColor: '#dddddd',
+            // border: '1px solid #ccc',
+              
+              fontSize: '17px',
+            }}
+        >
+          {showHistory && history.map((item, index) => (
+
+            <div key={index}
+            style={{
+              backgroundColor: '#dddddd',
+              width: '100%',              
+              padding: '7px',
+              justifySelf: 'start',
+              alignSelf: 'start' 
+              // paddingLeft: '15px'
+            }}
+            >
+               {index + 1}: {item.temperature} {item.inputicon} → {item.result.toFixed(2)} {item.icon}
+            </div>
+          ))}
+
+        </div>
+
+
+
     </div>
         </div>
   )
